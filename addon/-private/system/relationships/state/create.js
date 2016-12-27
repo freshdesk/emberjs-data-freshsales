@@ -37,3 +37,13 @@ Relationships.prototype.get = function(key) {
   }
   return relationships[key];
 };
+
+// This gives back the isDirty state of each relationship.
+Relationships.prototype.isDirty = function() {
+  var relationshipsByName = get(this.record.type, 'relationshipsByName');
+  var keys = relationshipsByName._keys.toArray();
+
+  return keys.some((key) => {
+    return this.get(key).isDirty;
+  });
+};

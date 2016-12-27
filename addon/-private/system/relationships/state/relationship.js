@@ -19,6 +19,7 @@ export default function Relationship(store, record, inverseKey, relationshipMeta
   this.meta = null;
   this.hasData = false;
   this.hasLoaded = false;
+  this.isDirty = false;
 }
 
 Relationship.prototype = {
@@ -245,5 +246,7 @@ Relationship.prototype = {
    */
   setHasLoaded(value) {
     this.hasLoaded = value;
-  }
+  },
+
+  rollback() {}
 };
