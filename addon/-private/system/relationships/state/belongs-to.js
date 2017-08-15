@@ -77,6 +77,8 @@ BelongsToRelationship.prototype.addRecord = function(newRecord) {
 
   this.inverseRecord = newRecord;
   this._super$addRecord(newRecord);
+
+  this.isDirty = this.canonicalState !== newRecord; // Checking if belongsTo was a newRecord, if not, set a dirty state on it.
   this.record.notifyBelongsToChanged(this.key);
 };
 
@@ -159,4 +161,8 @@ BelongsToRelationship.prototype.reload = function() {
   }
 
   return this.findRecord();
+};
+
+BelongsToRelationship.prototype.rollback = function() {
+  this.setRecord(this.canonicalState);
 };

@@ -125,6 +125,20 @@ var Model = Ember.Object.extend(Ember.Evented, {
   hasDirtyAttributes: Ember.computed('currentState.isDirty', function() {
     return this.get('currentState.isDirty');
   }),
+
+  /**
+    If this property is `true` the record's relationship is in the `dirty` state. The
+    record's relationship has local changes that have not yet been saved by the
+    adapter. This includes records that have been created (but not yet
+    saved) or deleted.
+
+    @property hasDirtyRelationships
+    @type {Boolean}
+    @readOnly
+  */
+  hasDirtyRelationships: function() {
+    return this._internalModel._relationships.isDirty();
+  },
   /**
     If this property is `true` the record is in the `saving` state. A
     record enters the saving state when `save` is called, but the
@@ -650,6 +664,33 @@ var Model = Ember.Object.extend(Ember.Evented, {
     return this._internalModel.changedAttributes();
   },
 
+  /**
+    Rolls back any changes to a relationship along with its own attribute changes.
+
+    Example
+
+    ```app/models/book.js
+    import DS from 'ember-data';
+
+    export default DS.Model.extend({
+      bookOwner: belongsTo('bookOwner')
+    });
+    ```
+
+    ```javascript
+    var mascot = store.peekRecord('book', 1); // bookOwner => null
+    mascot.set('bookOwner', {id: 1, name: 'Ember Author'});
+    mascot.rollback(); //
+    model.get('bookOwner'); // null
+    ```
+
+    @method rollback
+    @return null
+  */
+  rollback() {
+    this._internalModel.rollback();
+  },
+
   //TODO discuss with tomhuda about events/hooks
   //Bring back as hooks?
   /**
@@ -687,6 +728,26 @@ var Model = Ember.Object.extend(Ember.Evented, {
   */
   rollbackAttributes() {
     this._internalModel.rollbackAttributes();
+  },
+
+  /**
+    If the model's relationships `hasDirtyAttributes` this function will discard any unsaved
+    changes. If the model `isNew` it will be removed from the store.
+
+    Example
+
+    ```javascript
+    record.get('bookOwners'); // '[{id:1, name:'Ember Author'}]'
+    record.get('bookOwners').pushObject({id:1, name:'Javascript Author'});
+    record.get('bookOwners'); // '[{id:1, name:'Ember Author'},{id:1, name:'Javascript Author'}]'
+    record.rollback();
+    record.get('bookOwners'); // '[{id:1, name:'Ember Author'}]'
+    ```
+
+    @method rollbackAttributes
+  */
+  rollbackRelationships: function() {
+    this._internalModel.rollbackRelationships();
   },
 
   /*

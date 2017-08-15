@@ -275,6 +275,7 @@ var DirtyState = {
 
     rollback(internalModel) {
       internalModel.rollbackAttributes();
+      internalModel.rollbackRelationships();
       internalModel.triggerLater('ready');
     }
   },
