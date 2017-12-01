@@ -163,5 +163,7 @@ BelongsToRelationship.prototype.reload = function() {
 };
 
 BelongsToRelationship.prototype.rollback = function() {
-  this.setRecord(this.canonicalState);
+  if (!this.isAsync) {
+    this.setRecord(this.canonicalState);
+  }
 };
